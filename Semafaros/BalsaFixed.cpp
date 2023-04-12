@@ -1,9 +1,7 @@
-// BalsadaDoredoSofrimento.cpp : Este arquivo contém a função 'main'. A execução do programa começa e termina ali.
-//
-
 #include <string.h>
 #include <thread>
 #include <iostream>
+#include <windows.h>
 using namespace std;
 
 // 1 ocupado// 4 ocupado por hacker
@@ -95,12 +93,12 @@ void board(int isHacker)
     int entrou = 0;
     while (mute == 1)
     {
-        // mutex
+        Sleep(10);
     }
     while (entrou == 0)
     {
         muteUp();
-        if (balsa.qtd < 4)
+        if (balsa.qtd < 4 && ((balsa.hackers != 3 && isHacker != 0) || (balsa.servos != 3 && isHacker != 1)))
         {
             entrou = temAcentoDisponivel(isHacker);
             if (balsa.qtd == 4)
@@ -153,7 +151,6 @@ int main()
 
     printf("mensagem main\n");
 }
-
 // Executar programa: Ctrl + F5 ou Menu Depurar > Iniciar Sem Depuração
 // Depurar programa: F5 ou menu Depurar > Iniciar Depuração
 
