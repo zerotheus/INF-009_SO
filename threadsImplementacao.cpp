@@ -1,6 +1,9 @@
 #include <string.h>
 #include <thread>
 #include <iostream>
+#include <Windows.h>
+
+/*Simulação de uma condição de corrida e como controlar o acesso a variavel*/
 
 using namespace std;
 
@@ -22,6 +25,7 @@ void task1()
     while (mutex != 0)
     {
         printf("espera task1\n");
+        Sleep(100);
     }
     mutexDown();
     x = x + 1;
@@ -34,6 +38,7 @@ void task2()
     while (mutex != 0)
     {
         printf("espera task2\n");
+        Sleep(100);
     }
     mutexDown();
     x = x * 2;
