@@ -29,4 +29,4 @@ uma solução para o problema descrito.
 
 <h1>Aviso</h1>
 
-<p>Como o intuito é aprendizado as outras versoes que tem nao apresentaram consistencia na resolução, somente a fixed apresenta o resultado desejado com maior frequencia no windows ainda apresenta resultados errados, no linux isso ocorreu com bem menos frequencia</p>
+<p>Como o intuito é aprendizado as outras versoes que tem nao apresentaram consistencia na resolução, somente a fixed apresenta o resultado desejado depois da adiação do sleep, ponto negativo, tenho de fazer uma versao windows e uma linux</p>
