@@ -30,3 +30,6 @@ uma solução para o problema descrito.
 <h1>Aviso</h1>
 
 <p>Como o intuito é aprendizado as outras versoes que tem nao apresentaram consistencia na resolução, somente a fixed apresenta o resultado desejado depois da adiação do sleep, ponto negativo, tenho de fazer uma versao windows e uma linux</p>
+<p>A minha tentativa de implementar uma mutex apenas minha falhou, leia-se implementar uma mutex que funcione perfeitamente como a do c++, ela nao conseguiu garantir em 100% dos casos que a balsa saisse cheia, ou sem as configuração restrita, ou evita-se de sair com a configuração indesejada, redundancia de verificações conseguia diminuir, as ocorrencias, mas isso nao é o desejado, um sleep(tempo) conseguia resolver, mas ainda sim era indesejado, pois nao podemos fazer nenhuma suposição sobre a velocidade das threads.
+Dito isso a implementação da mutex padrão do c++ e da variavel atomica do c++ tiveram resultados satisfatorios, evitaram acesso multiplo de threads a trechos e variaveis de codigo compartilhas e nenhuma balsa saiu com configuração indesejada. Ainda tentarei me aproximar mais da implementação padrão do c++</p>
+<p>Balsa, balsaAlternativa, BalsaFixed.cpp nao funcionam perfeitamente</p>
