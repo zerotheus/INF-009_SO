@@ -17,16 +17,34 @@ int main()
 
 void produtor()
 {
-}
-
-void consumidor()
-{
-}
-
-void consumir()
-{
+    static int produzEm = 0;
+    if (cheio == 99)
+    {
+        printf("produtor sleep");
+        // sleep
+    }
+    produzir(); // RC
 }
 
 void produzir()
 {
+    vazio--;
+    cheio++;
+}
+
+void consumidor()
+{
+    static int consomeEm = 0;
+    if (vazio == 0)
+    {
+        printf("consumidor sleep");
+        // sleep
+    }
+    consumir(); // RC
+}
+
+void consumir()
+{
+    vazio++;
+    cheio--;
 }
