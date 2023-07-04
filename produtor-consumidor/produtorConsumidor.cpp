@@ -2,15 +2,24 @@
 #include <stdio.h>
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 #include <atomic>
 using namespace std;
 
 int buffer[100]; // RC
-int cheio = 0;
-int vazio = 99;
-mutex mutual;
+int cheio = 0, vazio = 99;
+condition_variable daConsumidora, daProdutora;
 atomic<bool> mutualValue(false);
+bool estaCheio = false, estaVazio = true;
+typedef struct semafaros
+{
+    mutex mutual;
+    mutex mutexProdutoras;
+    mutex mutexConsumidoras;
+} semafaro;
+semafaro semapharo;
 
+void retornaaZero(int *num);
 void produtor();
 void produzir(int pos);
 void consumidor();
@@ -20,6 +29,7 @@ void ativaMutex();
 void desativaMutex();
 
 thread produtora(produtor);
+thread consumidora(consumidor);
 
 int main()
 {
@@ -29,61 +39,108 @@ int main()
         buffer[i] = 0;
     }
     printf("De volta");
-    // thread consumidora(consumidor);
     produtora.join();
+    consumidora.join();
 }
 
 void produtor()
 {
+    int i = 0;
     static int produzEm = 0;
-    if (cheio == 99)
+    while (i < 257)
     {
-        printf("produtor sleep");
+        i++;
+        if (cheio == 99)
+        {
+            semapharo.mutexConsumidoras.unlock();
+            printf("cheio\n");
+            estaCheio = true;
+            estaVazio = false;
+            semapharo.mutexProdutoras.lock();
+            unique_lock<std::mutex> lk(semapharo.mutexProdutoras);
+            daConsumidora.notify_one();
+            daProdutora.wait(lk);
+            printf("\nprodutor sleep\n");
+        }
+        else
+        {
+            estaCheio = false;
+        }
+        espera();
+        ativaMutex();
+        produzir(produzEm); // RC
+        if (produzEm == 100)
+            retornaaZero(&produzEm);
+        desativaMutex();
     }
-    espera();
-    ativaMutex();
-    produzir(produzEm); // RC
-    desativaMutex();
+    printf("\nend\n");
 }
 
 void produzir(int pos)
 {
     vazio--;
+    buffer[pos] = 1;
     cheio++;
 }
 
-void consumidor(int pos)
+void consumidor()
 {
+    int i = 0;
     static int consomeEm = 0;
-    if (vazio == 0)
+    while (i < 257)
     {
-        printf("consumidor sleep");
-        // sleep
+        i++;
+        if (vazio == 0)
+        {
+            semapharo.mutexProdutoras.unlock();
+            daProdutora.notify_all();
+            printf("\nconsumidor sleep\n");
+            semapharo.mutexConsumidoras.lock();
+            unique_lock<std::mutex> lk(semapharo.mutexConsumidoras);
+            daConsumidora.wait(lk);
+            estaVazio = true;
+        }
+        else
+        {
+            estaVazio = false;
+        }
+        espera();
+        ativaMutex();
+        consumir(consomeEm); // RC
+        if (consomeEm == 100)
+            retornaaZero(&consomeEm);
+        desativaMutex();
     }
-    consumir(consomeEm); // RC
 }
 
 void consumir(int pos)
 {
     vazio++;
+    buffer[pos] = 3;
     cheio--;
+}
+
+void ativaMutex()
+{
+    semapharo.mutual.lock();
+    mutualValue.store(true);
+}
+
+void desativaMutex()
+{
+    semapharo.mutual.unlock();
+    mutualValue.store(false);
 }
 
 void espera()
 {
     while (mutualValue.load())
     {
+        printf("wait");
     }
 }
 
-void ativaMutex()
+void retornaaZero(int *num)
 {
-    mutual.lock();
-    mutualValue.store(true);
-}
-
-void desativaMutex()
-{
-    mutual.unlock();
-    mutualValue.store(false);
+    *num = 0;
 }
