@@ -47,7 +47,6 @@ void produtor()
         if (cheio == 99)
         {
             mutexdasProdutoras.store(true);
-            mutexdasConsumidoras.store(false);
             printf("cheio\n");
             estaCheio = true;
             printf("\nprodutor sleep\n");
@@ -74,6 +73,7 @@ void produzir(int pos)
     buffer[pos] = 1;
     show();
     cheio++;
+    mutexdasConsumidoras.store(false);
 }
 
 void consumidor()
@@ -86,7 +86,6 @@ void consumidor()
         if (vazio == 99)
         {
             mutexdasConsumidoras.store(true);
-            mutexdasProdutoras.store(false);
             printf("\nconsumidor sleep\n");
             bool finalizado = esperaCons();
             if (!produtora.joinable() && vazio == 99)
@@ -114,6 +113,7 @@ void consumir(int pos)
     buffer[pos] = 3;
     show();
     cheio--;
+    mutexdasProdutoras.store(false);
 }
 
 void ativaMutex()
