@@ -7,7 +7,7 @@
 using namespace std;
 
 int buffer[100]; // RC
-int cheio = 0, vazio = 99;
+atomic<short> cheio(0), vazio(99);
 atomic<bool> mutualValue(false), mutexdasProdutoras(false), mutexdasConsumidoras(true);
 bool estaCheio = false, estaVazio = true;
 
@@ -32,7 +32,6 @@ int main()
     {
         buffer[i] = 0;
     }
-    printf("De volta");
     produtora.join();
     consumidora.join();
 }
@@ -56,6 +55,10 @@ void produtor()
         {
             estaCheio = false;
         }
+        if (cheio == 0)
+        {
+            mutexdasConsumidoras.store(true);
+        }
         espera();
         ativaMutex();
         produzir(produzEm); // RC
@@ -63,8 +66,11 @@ void produtor()
         if (produzEm == 100)
             retornaaZero(&produzEm);
         desativaMutex();
+        if (cheio != 0)
+        {
+            mutexdasConsumidoras.store(false);
+        }
     }
-    printf("\nend\n");
 }
 
 void produzir(int pos)
@@ -73,7 +79,6 @@ void produzir(int pos)
     buffer[pos] = 1;
     show();
     cheio++;
-    mutexdasConsumidoras.store(false);
 }
 
 void consumidor()
@@ -87,7 +92,7 @@ void consumidor()
         {
             mutexdasConsumidoras.store(true);
             printf("\nconsumidor sleep\n");
-            bool finalizado = esperaCons();
+            esperaCons();
             if (!produtora.joinable() && vazio == 99)
             {
                 return;
@@ -170,5 +175,5 @@ void show()
             printf("\n");
         }
     }
-    printf("\ncheio: %d\tvazio %d\n", cheio, vazio);
+    printf("\ncheio: %d\tvazio %d\n", cheio.load(), vazio.load());
 }
