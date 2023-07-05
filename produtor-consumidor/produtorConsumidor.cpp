@@ -19,7 +19,7 @@ void consumir(int pos);
 void espera();
 void ativaMutex();
 void desativaMutex();
-void esperaCons();
+bool esperaCons();
 void esperaProd();
 void show();
 thread produtora(produtor);
@@ -88,8 +88,8 @@ void consumidor()
             mutexdasConsumidoras.store(true);
             mutexdasProdutoras.store(false);
             printf("\nconsumidor sleep\n");
-            esperaCons();
-            if (!produtora.joinable())
+            bool finalizado = esperaCons();
+            if (!produtora.joinable() && vazio == 99)
             {
                 return;
             }
@@ -142,16 +142,17 @@ void esperaProd()
     }
 }
 
-void esperaCons()
+bool esperaCons()
 {
     while (mutexdasConsumidoras.load())
     {
         //  printf("consu\n");
         if (!produtora.joinable())
         {
-            return;
+            return true;
         }
     }
+    return false;
 }
 
 void retornaaZero(int *num)
@@ -164,7 +165,7 @@ void show()
     for (int i = 0; i < 100; i++)
     {
         printf(" %d ", buffer[i]);
-        if (i % 10 == 0)
+        if ((i + 1) % 10 == 0 && i != 0)
         {
             printf("\n");
         }
